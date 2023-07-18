@@ -5,13 +5,18 @@ import firebase from "./src/firebaseConnection";
 export default function App(){
 
   const [nome, setNome] = useState('Carregando ...')
+  const [idade, setIdade] = useState('Carregando ...')
 
   useEffect(() => {
-      async function dados(){
-        await firebase.database().ref('nome').on('value', (snapshot)=>{
-          setNome(snapshot.val())
+    //olheiro fica o tempo todo olhando a data base
+     async function dados(){
+       await firebase.database().ref('usuarios/1').on('value', (snapshot)=>{
+          setNome(snapshot.val().nome)
+          setIdade(snapshot.val().idade)
         })
       }
+
+
   dados();
 
   }, []);
@@ -20,7 +25,9 @@ export default function App(){
     <View style={{marginTop: 25}}>
       <Text style={{fontSize: 25}}>
         Deus é muito bom o tempo todo!!! !! {nome}
+       
       </Text>
+      <Text> idade = {idade}</Text>
     </View>
   )
 }
