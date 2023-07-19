@@ -8,33 +8,31 @@ console.disableYellowBox=true;
 export default function App(){
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const [user, setUser] = useState('');
 
  
 
 
 
-  async function cadastrar(){
-    await firebase.auth().createUserWithEmailAndPassword(email, password)
+  async function logar(){
+    await firebase.auth().signInWithEmailAndPassword(email, password)
     .then( (value) => {
-      alert('Usuario criado: ' + value.user.email);
+      alert('Bem vindo: ' + value.user.email);
+      setUser(value.user.email);
     })
-    .catch( (error) => {
-      if(error.code === 'auth/weak-password'){
-        alert('Sua senha deve ter pelo menos 6 caracteres');
-        return;
-      }
-      if(error.code === 'auth/invalid-email'){
-        alert('Email invalido');
-        return;
-      }else{
+    .catch( (error) => {    
         alert('Ops algo deu errado!');
         return;
-      }
     })
 
     setEmail('');
     setPassword('');
+  }
+
+  async function logout(){
+    await firebase.auth().signOut();
+    setUser('');
+    alert('Deslogado com sucesso!!!')
   }
 
   return(
@@ -56,12 +54,26 @@ export default function App(){
       />
 
       <Button
-      title="Cadastrar"
-      onPress={cadastrar}
+      title="Entrar"
+      onPress={logar}
       />
 
-     
+        <Text style={{marginTop:20, marginBottom:20, fontSize:23, textAlign:'center'}}>
+          {user}
+        </Text>
 
+    {user.length > 0 ? 
+    (
+      
+    
+        <Button 
+        title='Sair'
+        onPress={logout}/>
+        
+    ) : 
+    (
+      <Text style={{marginTop:20, marginBottom:20, fontSize:23, textAlign:'center'}}>Nenhum usuario logado</Text>
+    )}
 
     </View>
   );
