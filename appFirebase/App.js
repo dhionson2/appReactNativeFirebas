@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, Button, FlatList, ActivityIndicator} from 'react-native';
+import { View, Text, StyleSheet, TextInput, Button, FlatList, ActivityIndicator, Alert} from 'react-native';
 import firebase from './src/firebaseConnection';
 
 
@@ -8,35 +8,34 @@ console.disableYellowBox=true;
 export default function App(){
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [user, setUser] = useState('');
-
- 
+  const [name, setName] = useState('');
 
 
-
-  async function logar(){
-    await firebase.auth().signInWithEmailAndPassword(email, password)
-    .then( (value) => {
-      alert('Bem vindo: ' + value.user.email);
-      setUser(value.user.email);
+  async function cadastrar() {
+    await firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then((value)=> {
+      alert('Usuario cadastrado com sucesso !')
+      firebase.database().ref('usuarios').child(value.user.uid).set({
+        nome: name
+      })
     })
-    .catch( (error) => {    
-        alert('Ops algo deu errado!');
-        return;
+    .catch((error)=> {
+      alert('Algo deu errado !')
     })
-
-    setEmail('');
-    setPassword('');
-  }
-
-  async function logout(){
-    await firebase.auth().signOut();
-    setUser('');
-    alert('Deslogado com sucesso!!!')
+   setEmail('');
+   setName('');
+   setPassword('');
   }
 
   return(
     <View style={styles.container}>
+      <Text style={styles.texto}>Nome</Text>
+      <TextInput
+      style={styles.input}
+      underlineColorAndroid="transparent"
+      onChangeText={(texto) => setName(texto) }
+      value={name}
+      />
       <Text style={styles.texto}>Email</Text>
       <TextInput
       style={styles.input}
@@ -54,26 +53,11 @@ export default function App(){
       />
 
       <Button
-      title="Entrar"
-      onPress={logar}
+      title="Cadastrar"
+      onPress={cadastrar}
       />
 
-        <Text style={{marginTop:20, marginBottom:20, fontSize:23, textAlign:'center'}}>
-          {user}
-        </Text>
-
-    {user.length > 0 ? 
-    (
-      
-    
-        <Button 
-        title='Sair'
-        onPress={logout}/>
-        
-    ) : 
-    (
-      <Text style={{marginTop:20, marginBottom:20, fontSize:23, textAlign:'center'}}>Nenhum usuario logado</Text>
-    )}
+   
 
     </View>
   );
